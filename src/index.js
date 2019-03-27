@@ -231,7 +231,8 @@ class Calculator extends React.Component {
 		this.state = {
 			result: '0',
 			value: '0',
-			operator: '+'
+			operator: '+',
+			isShowingResult: false,
 		}
 
 		this.handleNumberClick = this.handleNumberClick.bind(this);
@@ -242,31 +243,55 @@ class Calculator extends React.Component {
 
 	handleNumberClick(value) {
 		this.setState(function(state, props) {
-			let tempValue = state.value;
-			if(tempValue === '0') {
-				tempValue = '';
+			if(state.isShowingResult === true) {
+				let newState = {result: state.value, value: value, isShowingResult: false}
+				if(value === '.')
+					newState.value = '0.';
+				if(state.value === Infinity) {
+					newState.result = '0';
+				}
+				return newState;
 			}
-			if(value === '.' && tempValue.indexOf('.') !== -1) {
-				return {value: tempValue}
+			let prevValue = state.value;
+			if(value === '.' && prevValue.indexOf('.') === -1) {
+				return {value: prevValue + value}
 			}
-			return {value: (tempValue + value)}
+			if(prevValue === '0') {
+				prevValue = '';
+			}
+			return {value: (prevValue + value)}
 		})
 	}
 
 	handleOperatorClick(operator) {
-		
+		this.setState((state, props)=> {
+			if(state.isShowingResult === true) {
+				return{operator}
+			}
+			let newResult = calculation.perform(state.result, state.value, state.operator)
+			return {
+				result: newResult,
+				value: newResult,
+				operator: operator,
+				isShowingResult: true
+			}
+		});		
 	}
 
-	handleRevisionClick(extend) {
-		if(extend === 'Del') {
+	handleRevisionClick(extent) {
+		if(extent === 'Del') {
 			this.setState((state, props)=>{
-				let newValue = state.value.slice(0, state.value.length-1);
+				let newValue = state.value;
+				if(newValue === Infinity) {
+					newValue = '0';
+				}
+				newValue = newValue.slice(0, state.value.length-1)
 				if(newValue === '') {
 					newValue = '0';
 				}
 				return {value: newValue}
 			})
-		} else if (extend === 'Clear') {
+		} else if (extent === 'Clear') {
 			this.setState({
 				result: '0',
 				value: '0'
@@ -276,11 +301,12 @@ class Calculator extends React.Component {
 
 	handleCalculateClick() {
 		this.setState((state, props)=>{
-			let newResult = calculation.perform(this.state.result, this.state.value, this.state.operator)
+			let newResult = calculation.perform(state.result, state.value, state.operator)
 			return {
-				result: newResult,
+				result: 0,
 				value: newResult,
-				operator: '+'
+				operator: '+',
+				isShowingResult: true
 			}
 		})
 
@@ -331,6 +357,11 @@ var calculation = {
 }
 
 ReactDOM.render(<Page />, document.getElementById('root'));
+
+window.onkeydown = function(event) {
+	let d=document.getElementByClassName('num9')
+	console.log(d)
+}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
