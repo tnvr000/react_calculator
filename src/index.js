@@ -10,126 +10,126 @@ var buttons = [
 		classes: 'button clear',
 		type: 'revision',
 		value: 'Clear',
-		key: ' '
+		keys: ['Escape']
 	},
 	{
 		name: 'Delete Last Digit',
 		classes: 'button del',
 		type: 'revision',
 		value: 'Del',
-		key: '\b'
+		keys: ['Backspace']
 	},
 	{
 		name: 'Number 0',
 		classes: 'button num0',
 		type: 'number',
 		value: '0',
-		key: '0'
+		keys: ['0']
 	},
 	{
 		name: 'Number 1',
 		classes: 'button num1',
 		type: 'number',
 		value: '1',
-		key: '1'
+		keys: ['1']
 	},
 	{
 		name: 'Number 2',
 		classes: 'button num2',
 		type: 'number',
 		value: '2',
-		key: '2'
+		keys: ['2']
 	},
 	{
 		name: 'Number 3',
 		classes: 'button num3',
 		type: 'number',
 		value: '3',
-		key: '3'
+		keys: ['3']
 	},
 	{
 		name: 'Number 4',
 		classes: 'button num4',
 		type: 'number',
 		value: '4',
-		key: '4'
+		keys: ['4']
 	},
 	{
 		name: 'Number 5',
 		classes: 'button num5',
 		type: 'number',
 		value: '5',
-		key: '5'
+		keys: ['5']
 	},
 	{
 		name: 'Number 6',
 		classes: 'button num6',
 		type: 'number',
 		value: '6',
-		key: '6'
+		keys: ['6']
 	},
 	{
 		name: 'Number 7',
 		classes: 'button num7',
 		type: 'number',
 		value: '7',
-		key: '7'
+		keys: ['7']
 	},
 	{
 		name: 'Number 8',
 		classes: 'button num8',
 		type: 'number',
 		value: '8',
-		key: '8'
+		keys: ['8']
 	},
 	{
 		name: 'Number 9',
 		classes: 'button num9',
 		type: 'number',
 		value: '9',
-		key: '9'
+		keys: ['9']
 	},
 	{
 		name: 'Decimal',
 		classes: 'button dec',
 		type: 'number',
 		value: '.',
-		key: '.'
+		keys: ['.']
 	},
 	{
 		name: 'Division',
 		classes: 'button operator div',
 		type: 'operator',
 		value: '/',
-		key: 'd'
+		keys: ['/', 'd']
 	},
 	{
 		name: 'Multiplication',
 		classes: 'button operator mul',
 		type: 'operator',
 		value: '*',
-		key: 'f'
+		keys: ['*', 'f']
 	},
 	{
 		name: 'Substraction',
 		classes: 'button operator sub',
 		type: 'operator',
 		value: '-',
-		key: 's'
+		keys: ['-', 's']
 	},
 	{
 		name: 'Addition',
 		classes: 'button operator add',
 		type: 'operator',
 		value: '+',
-		key: 'a'
+		keys: ['+', 'a']
 	},
 	{
 		name: 'Equal',
 		classes: 'button equ equ',
 		type: 'equality',
 		value: '=',
-		key: '\n'
+		keys: ['Enter']
 	}
 ]
 
@@ -214,7 +214,7 @@ class ButtonPad extends React.Component {
 				value={button.value}
 				dataType={button.type}
 				handleClick={this.handleClick} 
-				key={button.key} />)
+				key={button.keys[0]} />)
 			return null;
 		});
 		return(
@@ -281,11 +281,11 @@ class Calculator extends React.Component {
 	handleRevisionClick(extent) {
 		if(extent === 'Del') {
 			this.setState((state, props)=>{
-				let newValue = state.value;
+				let newValue = state.value + '';
 				if(newValue === Infinity) {
 					newValue = '0';
 				}
-				newValue = newValue.slice(0, state.value.length-1)
+				newValue = newValue.slice(0, newValue.length - 1)
 				if(newValue === '') {
 					newValue = '0';
 				}
@@ -359,8 +359,19 @@ var calculation = {
 ReactDOM.render(<Page />, document.getElementById('root'));
 
 window.onkeydown = function(event) {
-	let d=document.getElementByClassName('num9')
-	console.log(d)
+	let button=getButton(event.key)
+	if(button !== null) {
+		button.click();
+	}
+}
+
+function getButton(key) {
+	for(let i = 0; i < buttons.length; ++i) {
+		if(buttons[i].keys.includes(key)) {
+			return document.getElementsByClassName(buttons[i].classes)[0];
+		}
+	}
+	return null
 }
 
 // If you want your app to work offline and load faster, you can change
